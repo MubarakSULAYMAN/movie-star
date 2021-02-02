@@ -2,6 +2,7 @@ import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
 import store from './store'
+import axios from 'axios';
 
 import '@/assets/styles/main.css'
 
@@ -14,6 +15,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 library.add(faSearch, faStar, faThumbsUp, faPlusSquare, faTrashAlt, faMinusSquare, faBookmark, faShareAlt, faCreativeCommonsShare, faExternalLinkAlt, faChevronCircleLeft, faChevronCircleRight, faAngleDoubleLeft, faAngleDoubleRight)
 
 Vue.component('font-awesome-icon', FontAwesomeIcon)
+
+Vue.use(axios)
 
 Vue.config.productionTip = false
 
