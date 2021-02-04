@@ -7,13 +7,14 @@ module.exports = {
                 fer: '#CE2029',
                 bdo: '#9C2542',
                 jas: '#FFBD2D',
-                blackl : '#262A41'
+                blackl: '#262A41'
             },
         },
     },
     variants: {
         extend: {
-            margin: ['first', 'last']
+            margin: ['first', 'last'],
+            opacity: ['disabled'],
         },
     },
     plugins: [],

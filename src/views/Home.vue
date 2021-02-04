@@ -21,7 +21,7 @@
           <span class="inline-block relative w-5/6">
             <input
               type="text"
-              class="search-input w-full pr-12 pl-4 py-2 font-light text-base md:text-xl rounded-3xl focus:outline-none focus:ring-8 focus:ring-bdo text-bdo text-center transition duration-700 ease-in-out"
+              class="search-input w-full pr-12 pl-4 py-2 font-light text-base md:text-xl rounded-3xl focus:outline-none focus:ring-4 md:focus:ring-8 focus:ring-bdo text-bdo text-center transition duration-700 ease-in-out"
               placeholder="Let's search for 'Rambo 4'"
               autocomplete="off"
               autofocus
@@ -47,20 +47,40 @@
           <p class="title mb-2 text-center font-bold text-2xl underline">
             History
           </p>
-          <div class="list w-full h-full px-4 py-2 overflow-y-auto">
-            <ul v-for="(n, index) in 20" :key="n">
-              <li>{{ ++index }} . None available</li>
-            </ul>
+          <div
+            class="list w-full h-full px-4 py-2 flex justify-center items-center overflow-y-auto"
+          >
+            <div
+              class="text-center font-bold text-xl md:text-3xl"
+              v-if="recentSearch.length === 0"
+            >
+              <p>No history available</p>
+            </div>
+            <div class="w-full h-full" v-if="recentSearch.length > 0">
+              <ul v-for="(n, index) in 20" :key="n">
+                <li>{{ ++index }} . None available</li>
+              </ul>
+            </div>
           </div>
         </div>
         <div class="frequent px-2 pb-12 overflow-hidden">
           <p class="title mb-2 text-center font-bold text-2xl underline">
             Frequent
           </p>
-          <div class="list w-full h-full px-4 py-2 overflow-y-auto">
-            <ul v-for="(n, index) in 20" :key="n">
-              <li>{{ ++index }} . None available</li>
-            </ul>
+          <div
+            class="list w-full h-full px-4 py-2 flex justify-center items-center overflow-y-auto"
+          >
+            <div
+              class="text-center font-bold text-xl md:text-3xl"
+              v-if="frequentSearch.length === 0"
+            >
+              <p>No frequent search available</p>
+            </div>
+            <div class="w-full h-full" v-if="frequentSearch.length > 0">
+              <ul v-for="(n, index) in 20" :key="n">
+                <li>{{ ++index }} . None available</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -70,16 +90,17 @@
       class="result-window h-screen md:h-full relative mt-12 md:mt-0 pt-28 md:pt-24 pb-10 bg-white flex flex-row flex-wrap overflow-hidden rounded-lg"
     >
       <div
-        class="adult-warning absolute top-0 left-0 p-2 rounded-br-lg rounded-tl-lg text-white font-medium bg-fer"
+        class="adult-warning absolute top-0 left-0 p-2 rounded-br-lg rounded-tl-lg text-white font-medium text-sm md:text-base bg-fer"
         v-if="adultContent === true"
       >
-        Adult contents included
+        May include Adult contents
       </div>
 
       <div
-        class="per-page absolute top-0 left-52 p-2 rounded-b-lg text-white font-medium bg-bdo"
+        class="per-page absolute top-0 left-60 p-2 rounded-b-lg text-white font-medium bg-bdo"
+        v-if="showingResult > 0"
       >
-        Per Page
+        Jump to Page
         <input
           type="number"
           class="per-page-input w-8 md:w-10 md:px-1 rounded-lg font-medium focus:outline-none text-bdo text-center"
@@ -89,26 +110,30 @@
           minlength="1"
           maxlength="2"
           step="5"
-          v-model="perPage"
+          v-model="jumpToValue"
         />
-        <span class="per-page-text">Between 5 and 25</span>
+        <span class="per-page-text"
+          >Enter number between 1 and {{ totalPages }} then press Enter</span
+        >
       </div>
 
       <div
         class="results-info absolute top-0 right-0 p-2 rounded-tr-lg rounded-bl-lg text-white font-medium bg-bdo"
+        v-if="showingResult > 0"
       >
-        5678 results found
+        Showing {{ showingResult }} movies
       </div>
 
       <div
         class="pages-info p-2 absolute bottom-0 left-0 rounded-bl-lg rounded-tr-lg text-white font-medium bg-bdo"
+        v-if="showingResult > 0"
       >
-        Page 1 of 2345
+        Page {{ currentPage }} of {{ totalPages }}
       </div>
 
       <div
         class="w-full h-full flex flex-col justify-center items-center"
-        v-if="movies.length === 0 && searching === false"
+        v-if="showingResult === 0 && searching === false"
       >
         <p class="mb-6 text-center text-6xl md:text-9xl font-black">
           Welcome Here
@@ -150,16 +175,19 @@
           >
             <div
               class="nominated-card relative w-full first:mt-2 last:mb-2 my-4 py-2 pr-10 pl-4 text-xs sm:text-sm bg-jas"
-              v-for="n in 5"
-              :key="n"
+              v-for="(movie, index) in nominations"
+              :key="index"
             >
-              <div class="name font-bold">movie.Title</div>
+              <div class="name font-bold">{{ movie.Title }}</div>
               <div class="others flex justify-between">
-                <div class="year">movie.Year | truncateYear</div>
-                <div class="group text-fer">movie.Rated</div>
+                <div class="year">{{ movie.Year | truncateYear }}</div>
+                <div class="group text-fer">{{ movie.Rated }}</div>
                 <div class="rate">
-                  <font-awesome-icon :icon="['far', 'star']" class="text-jas" />
-                  movie.imdbRating
+                  <font-awesome-icon
+                    :icon="['far', 'star']"
+                    class="bg-jas text-jas"
+                  />
+                  {{ movie.imdbRating }}
                 </div>
               </div>
               <span>
@@ -175,11 +203,11 @@
 
       <transition name="fly-in" appear>
         <div
-          class="nomination-info-overlay absolute top-0 left-0 w-full h-full bg-gray-50 rounded-lg opacity-80"
-          v-if="fullNomination"
+          class="nomination-info-overlay absolute top-0 left-0 w-full h-full bg-blackl rounded-lg opacity-90"
+          v-if="fullNomination === true"
         >
           <div
-            class="nomination-info absolute top-64 md:top-56 left-14 md:left-40 p-4 border-2 border-fer rounded-xl bg-white opacity-100 shadow-2xl"
+            class="nomination-info absolute top-64 md:top-56 left-14 md:left-40 p-4 border-2 border-fer rounded-xl bg-white shadow-2xl"
           >
             <p class="font-black text-lg sm:text-3xl">Nomination Completed</p>
             <p class="text-sm sm:text-xl text-bdo">
@@ -188,12 +216,13 @@
             <div class="flex justify-around mt-4">
               <button
                 class="px-2 sm:px-4 py-1 sm:py-2 rounded-xl sm:rounded-3xl bg-jas text-white focus:outline-none"
+                @click="nominations = []"
               >
                 Reset
               </button>
               <button
                 class="px-2 sm:px-4 py-1 sm:py-2 rounded-xl sm:rounded-3xl bg-fer text-white focus:outline-none"
-                @click="fullNomination = !fullNomination"
+                @click="fullNomination = false"
               >
                 Close
               </button>
@@ -206,14 +235,10 @@
         <!-- && window.outerWidth >= 768 -->
         <p
           class="absolute top-16 left-2 md:left-5 z-0 font-bold text-base md:text-xl"
-          v-if="movieName && movies.length === 0"
+          v-if="movieName && showingResult === 0"
         >
-          <span v-if="searching === false"
-            >Let's search for
-          </span>
-          <span v-if="searching === true"
-            >Searching for
-          </span>
+          <span v-if="searching === false">Let's search for </span>
+          <span v-if="searching === true">Searching for </span>
           <span class="capitalize text-bdo">
             {{ this.movieName | truncateName }}
           </span>
@@ -221,7 +246,7 @@
 
         <p
           class="absolute top-16 left-2 md:left-5 z-0 font-bold text-base md:text-xl"
-          v-if="this.$route.query.name && movies.length > 0"
+          v-if="this.$route.query.name && showingResult > 0"
         >
           Showing results for
           <span class="capitalize text-bdo">
@@ -239,7 +264,7 @@
         </div>
         <div
           class="movies-window w-full h-full flex flex-row flex-wrap overflow-y-auto"
-          v-if="movies.length > 0"
+          v-if="showingResult > 0"
         >
           <div
             class="movie-card w-64 md:w-72 h-72 md:h-80 my-6 last:mb-20 mx-auto sm:ml-6 md:ml-4"
@@ -250,21 +275,26 @@
               <img
                 :src="movie.Poster"
                 :alt="`Avatar for '${movie.Title}'`"
-                class="w-full h-full rounded-xl p-6 text-center font-bold"
+                class="w-full h-full rounded-xl text-center font-bold text-base md:text-xl"
               />
-              <span
-                class="vote inline-block p-1 md:p-2 absolute top-0 left-0 bg-black opacity-80 rounded-xl hover:text-jas"
+              <button
+                class="vote inline-block p-2 md:p-3 absolute top-0 left-0 bg-black opacity-70 hover:opacity-100 border-transparent hover:border-white rounded-xl hover:text-jas focus:outline-none disabled:opacity-50"
+                :disabled="nominations.length > 5"
+                :class="[{ inactive: nominations.length >= 10 }]"
+                @click="nominateMovie(movie)"
               >
                 <font-awesome-icon
                   :icon="['far', 'thumbs-up']"
                   class="text-white text-lg md:text-3xl"
                 />
-              </span>
+              </button>
             </div>
             <div class="details px-4 pb-1 text-sm font-medium">
-              <div class="name text-jas font-black">{{ movie.Title | truncateTitle }}</div>
+              <div class="name text-jas font-black">
+                {{ movie.Title | truncateTitle }}
+              </div>
               <div class="others flex justify-around">
-                <div class="year">{{ movie.Year }}</div>
+                <div class="year">{{ movie.Year | truncateYear }}</div>
                 <div class="group text-fer">{{ movie.Rated }}</div>
                 <div class="rate">
                   <font-awesome-icon :icon="['far', 'star']" class="text-jas" />
@@ -292,7 +322,7 @@
     </div>
     <div
       class="navigate flex flex-row justify-between absolute bottom-0 right-2 w-36 sm:w-48 md:w-44 lg:w-52 p-1 text-lg sm:text-xl md:text-2xl lg:text-3xl"
-      v-if="movies.length > 0"
+      v-if="showingResult > 0"
     >
       <button class="double-back">
         <font-awesome-icon :icon="['fas', 'angle-double-left']" />
@@ -318,54 +348,42 @@
 
 <script>
 import axios from "axios";
-// @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue'
 
 export default {
   name: "Home",
-  components: {
-    // HelloWorld
-  },
+  components: {},
 
   data() {
     return {
       movieName: "",
-      perPage: 10,
+      isWarning: false,
       searching: false,
       minimized: true,
-      fullNomination: false,
+      currentPage: 1,
+      jumpToValue: null,
+      totalResults: 0,
+      moviesCount: 0,
       movies: [],
+      moviesRated: [],
       adultContent: false,
       nominations: [],
-      isWarning: false,
-      // image: {backgroundImage: "url(https://source.unsplash.com/{width}x{height})"}
-      // image: {backgroundImage: "url(https://source.unsplash.com/4050x6000)"}
-      // image: {backgroundImage: "url(https://source.unsplash.com/1600x900)"}
-      // https://picsum.photos/200/300
-      // https://picsum.photos/200/300?grayscale
-      // https://picsum.photos/200/300/?blur=2
-      // https://picsum.photos/id/870/200/300?grayscale&blur=2
-      // https://loremflickr.com/1600/900
+      isActive: true,
+      recentSearch: [],
+      frequentSearch: [],
+      fullNomination: false,
     };
   },
 
   filters: {
-    replaceEmpty(value, title) {
-      if (!value) {
-        return `No ${title} provided.`;
-      } else return value;
-    },
-
     truncateYear(value) {
       if (!value) {
         return "N/A";
       }
 
       value = value.toString();
-      // value = String(value)
 
-      if (value.length > 3) {
-        value = value.slice(0, 3);
+      if (value.length > 4) {
+        value = value.slice(0, 4);
         return value;
       } else return value;
     },
@@ -376,7 +394,6 @@ export default {
       }
 
       value = value.toString();
-      // console.log('value: ', value)
 
       if (value.length > 15) {
         value = value.slice(0, 14) + "...";
@@ -390,60 +407,40 @@ export default {
       }
 
       value = value.toString();
-      // console.log('value: ', value)
 
       if (value.length > 34) {
         value = value.slice(0, 33) + "...";
         return value;
       } else return value;
     },
-
-    truncateEmail(value) {
-      if (!value) {
-        return "No email provided.";
-      }
-
-      value = value.toString();
-
-      if (value.length > 19) {
-        value = value.slice(0, 21) + "...";
-        return value;
-      } else return value;
-    },
-
-    truncateBio(value) {
-      if (!value) {
-        return "No bio provided.";
-      }
-
-      value = value.toString();
-
-      if (value.length > 37) {
-        value = value.slice(0, 34) + "...";
-        return value;
-      } else return value;
-    },
-
-    formatNum(num) {
-      if (!num) {
-        return "No number provided.";
-      }
-
-      // num = num.toString()
-      num = String(num);
-      // num = `${num}`
-      console.log(num);
-
-      num.replace(/[- )(]/g, "");
-      return num;
-      //   return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    },
   },
 
-  mounted() {
-    // if (this.movies.length) {
-      this.fetchMovie(this.$route.query.name);
-    // }
+  // mounted() {
+  // if (this.movies.length) {
+  // this.fetchMovie(this.$route.query.name);
+  // }
+  // },
+
+  computed: {
+    showingResult() {
+      if (this.moviesCount === this.movies.length) {
+        return this.moviesCount;
+      }
+
+      return this.movies.length;
+    },
+
+    totalPages() {
+      return Math.round(this.totalResults / 10);
+    },
+
+    // realTotalPages() {
+    //   return (this.totalResults / this.showingResult).toFixed();
+    // },
+
+    fullNominationState() {
+      return this.fullNominationInfo;
+    },
   },
 
   methods: {
@@ -457,9 +454,17 @@ export default {
       setTimeout(() => (this.isWarning = false), 5000);
     },
 
+    fullNominationInfo() {
+      if (this.nominations.length >= 5) {
+        this.fullNomination = true;
+      }
+
+      return this.fullNomination = false;
+    },
+
     async refetchMovie() {
       // if (this.movieName) {
-        await this.fetchMovie(this.movieName);
+      await this.fetchMovie(this.movieName);
       // }
     },
 
@@ -468,12 +473,15 @@ export default {
 
       if (searchTerm) {
         this.searching = true;
-      this.movies = [];
-      
+        this.movies = [];
+
         try {
           let response = await axios.get(
             `http://www.omdbapi.com/?s=${searchTerm}&apikey=18a1df1e`
           );
+
+          this.totalResults = response.data.totalResults;
+          this.moviesCount = response.data.Search.length;
 
           if ([200, 201].includes(response.status)) {
             let items = response.data.Search;
@@ -489,16 +497,26 @@ export default {
                 `http://www.omdbapi.com/?t=${items[i].Title}&page=1&apikey=18a1df1e`
               );
               this.movies.push(newReq.data);
+              this.moviesRated.push(newReq.data.Rated);
             }
 
             this.searching = false;
             console.log(this.movies);
+            console.log(this.moviesRated);
+            if (
+              this.moviesRated.some((i) =>
+                ["R", "R18", "X", "PG", "NC-17"].includes(i)
+              )
+            ) {
+              console.log("Adult");
+              this.adultContent = true;
+            }
 
             this.$router.push({
               path: "/search",
               query: {
                 name: searchTerm,
-                page: 1
+                page: 1,
               },
             });
           }
@@ -509,9 +527,26 @@ export default {
         }
         return;
       }
-      
+
       this.showWarning("A valid name is required to start a search.");
     },
+
+    nominateMovie(details) {
+      console.log(details);
+      this.nominations.push(details);
+      console.log(this.nominations);
+      // this.isActive = false
+    },
+
+    skipToPrevious() {},
+
+    toPrevious() {},
+
+    toNext() {},
+
+    skiopToNext() {},
+
+    jumpTo() {},
   },
 };
 </script>
@@ -521,9 +556,6 @@ $fer: #ce2029;
 $bdo: #9c2542;
 $jas: #ffbd2d;
 $blackl: #262a41;
-// .home {
-
-// }
 
 svg:hover {
   color: $jas;
@@ -574,7 +606,7 @@ input[type="number"] {
   position: absolute;
   z-index: 1;
   top: 120%;
-  left: 42%;
+  left: 20%;
   margin-left: -60px;
 }
 
@@ -630,29 +662,14 @@ input[type="number"] {
 .history,
 .frequent {
   background-color: white;
-  // padding: 10px 20px;
   clip-path: inset(0 round 10px 20px 40px 30px);
   -webkit-clip-path: inset(0 round 10px 20px 40px 30px);
 }
 
 .result-window {
-  // margin: 10px;
-  // border-radius: 10px;
   clip-path: polygon(0% 0%, 100% 0%, 100% 90%, 40% 100%, 0% 100%);
   -webkit-clip-path: polygon(0% 0%, 100% 0%, 100% 90%, 40% 100%, 0% 100%);
 }
-
-// .minimize:focus .nominations {
-//   width: 0;
-//   height: 0;
-//   display: none;
-// }
-
-// .not-minimize
-
-// .nomination-header:hover {
-//   background-color: $fer;
-// }
 
 .fa-minus-square:hover {
   color: red;
@@ -721,6 +738,11 @@ input[type="number"] {
   left: 999px;
 }
 
+.inactive {
+  cursor: none;
+  pointer-events: none;
+}
+
 @media screen and (max-width: 768px) {
   .home {
     font-size: 0.9rem;
@@ -735,7 +757,7 @@ input[type="number"] {
 
 // Transitions
 .fly-in-enter {
-  transform: translate(10px);
+  transform: translate(20px);
   opacity: 0;
 }
 .fly-in-enter-active,
@@ -744,7 +766,7 @@ input[type="number"] {
 }
 
 .fly-in-leave-to {
-  transform: translate(10px);
+  transform: translate(20px);
   opacity: 0;
 }
 
@@ -835,7 +857,6 @@ input[type="number"] {
   -webkit-transform: translateZ(0);
   -ms-transform: translateZ(0);
   transform: translateZ(0);
-  // z-index: 5555;
   -webkit-animation: load6 1.7s infinite ease, round 1.7s infinite ease;
   animation: load6 1.7s infinite ease, round 1.7s infinite ease;
 }
