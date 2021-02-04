@@ -204,7 +204,7 @@
       <transition name="fly-in" appear>
         <div
           class="nomination-info-overlay absolute top-0 left-0 w-full h-full bg-blackl rounded-lg opacity-90"
-          v-if="this.nominations.length >= 5"
+          v-if="this.nominations.length >= 5 && fullNomination === true"
         >
           <div
             class="nomination-info absolute top-64 md:top-56 left-14 md:left-40 p-4 border-2 border-fer rounded-xl bg-white shadow-2xl"
@@ -347,7 +347,8 @@
 </template>
 
 <script>
-import axios from "axios";
+// import axios from "axios";
+import apiRequest from "../utils/ApiUtils";
 
 export default {
   name: "Home",
@@ -355,6 +356,7 @@ export default {
 
   data() {
     return {
+      token: "18a1df1e",
       movieName: "",
       isWarning: false,
       searching: false,
@@ -370,7 +372,7 @@ export default {
       isActive: true,
       recentSearch: [],
       frequentSearch: [],
-      fullNomination: false,
+      fullNomination: true,
     };
   },
 
@@ -476,8 +478,8 @@ export default {
         this.movies = [];
 
         try {
-          let response = await axios.get(
-            `http://www.omdbapi.com/?s=${searchTerm}&apikey=18a1df1e`
+          let response = await apiRequest.get(
+            `/?s=${searchTerm}&apikey=${this.token}`
           );
 
           this.totalResults = response.data.totalResults;
@@ -493,8 +495,8 @@ export default {
             }
 
             for (let i = 0; i < items.length; i++) {
-              let newReq = await axios.get(
-                `http://www.omdbapi.com/?t=${items[i].Title}&page=1&apikey=18a1df1e`
+              let newReq = await apiRequest.get(
+                `/?t=${items[i].Title}&page=1&apikey=${this.token}`
               );
               this.movies.push(newReq.data);
               this.moviesRated.push(newReq.data.Rated);
