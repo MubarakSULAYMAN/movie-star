@@ -415,11 +415,11 @@ export default {
     },
   },
 
-  // mounted() {
-  // if (this.movies.length) {
-  // this.fetchMovie(this.$route.query.name);
-  // }
-  // },
+  mounted() {
+    // if (this.movies.length) {
+    this.fetchMovie(this.$route.query.name);
+    // }
+  },
 
   computed: {
     showingResult() {

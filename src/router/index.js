@@ -18,6 +18,7 @@ const routes = [
   {
     path: '/search',
     name: 'Search',
+    // redirect: '/',
     component: Home
   },
   {
