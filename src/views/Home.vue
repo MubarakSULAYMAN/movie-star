@@ -176,7 +176,7 @@
             <div
               class="nominated-card relative w-full first:mt-2 last:mb-2 my-4 py-2 pr-10 pl-4 text-xs sm:text-sm bg-jas"
               v-for="(movie, index) in nominations"
-              :key="index"
+              :key="`key-${index}`"
             >
               <div class="name font-bold">{{ movie.Title }}</div>
               <div class="others flex justify-between">
