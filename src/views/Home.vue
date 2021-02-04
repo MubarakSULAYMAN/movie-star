@@ -190,7 +190,7 @@
                   {{ movie.imdbRating }}
                 </div>
               </div>
-              <span>
+              <span @click="nominations.splice(index, 1)">
                 <font-awesome-icon
                   :icon="['far', 'trash-alt']"
                   class="absolute right-2 top-6 text-fer"
@@ -204,7 +204,7 @@
       <transition name="fly-in" appear>
         <div
           class="nomination-info-overlay absolute top-0 left-0 w-full h-full bg-blackl rounded-lg opacity-90"
-          v-if="fullNomination === true"
+          v-if="this.nominations.length >= 5"
         >
           <div
             class="nomination-info absolute top-64 md:top-56 left-14 md:left-40 p-4 border-2 border-fer rounded-xl bg-white shadow-2xl"
@@ -278,9 +278,9 @@
                 class="w-full h-full rounded-xl text-center font-bold text-base md:text-xl"
               />
               <button
-                class="vote inline-block p-2 md:p-3 absolute top-0 left-0 bg-black opacity-70 hover:opacity-100 border-transparent hover:border-white rounded-xl hover:text-jas focus:outline-none disabled:opacity-50"
-                :disabled="nominations.length > 5"
-                :class="[{ inactive: nominations.length >= 10 }]"
+                class="vote inline-block p-2 md:p-3 absolute top-0 left-0 bg-black opacity-80 hover:opacity-100 border-transparent hover:border-white rounded-xl hover:text-jas focus:outline-none disabled:opacity-50"
+                :disabled="nominations.includes(movie)"
+                :class="[{ inactive: nominations.length >= 5 }]"
                 @click="nominateMovie(movie)"
               >
                 <font-awesome-icon
@@ -438,9 +438,9 @@ export default {
     //   return (this.totalResults / this.showingResult).toFixed();
     // },
 
-    fullNominationState() {
-      return this.fullNominationInfo;
-    },
+    // fullNominationState() {
+    //   return this.fullNominationInfo;
+    // },
   },
 
   methods: {
@@ -454,13 +454,13 @@ export default {
       setTimeout(() => (this.isWarning = false), 5000);
     },
 
-    fullNominationInfo() {
-      if (this.nominations.length >= 5) {
-        this.fullNomination = true;
-      }
+    // fullNominationInfo() {
+    //   if (this.nominations.length >= 5) {
+    //     this.fullNomination = true;
+    //   }
 
-      return this.fullNomination = false;
-    },
+    //   return this.fullNomination = false;
+    // },
 
     async refetchMovie() {
       // if (this.movieName) {
