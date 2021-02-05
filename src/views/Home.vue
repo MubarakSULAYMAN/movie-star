@@ -90,17 +90,17 @@
       class="result-window h-screen md:h-full relative mt-12 md:mt-0 pt-28 md:pt-24 pb-10 bg-white flex flex-row flex-wrap overflow-hidden rounded-lg"
     >
       <div
-        class="adult-warning absolute top-0 left-0 p-2 rounded-br-lg rounded-tl-lg text-white font-medium text-sm md:text-base bg-fer"
+        class="adult-warning absolute top-0 left-0 p-2 rounded-br-lg rounded-tl-lg text-white font-medium text-xs md:text-sm bg-fer"
         v-if="adultContent === true"
       >
         May include Adult contents
       </div>
 
       <div
-        class="per-page absolute top-0 left-60 p-2 rounded-b-lg text-white font-medium bg-bdo"
+        class="per-page absolute top-0 left-1/2 p-2 rounded-b-lg text-white font-medium text-xs md:text-sm bg-bdo"
         v-if="showingResult > 0"
       >
-        Jump to Page
+        Jump to
         <input
           type="number"
           class="per-page-input w-8 md:w-10 md:px-1 rounded-lg font-medium focus:outline-none text-bdo text-center"
@@ -120,7 +120,7 @@
       </div>
 
       <div
-        class="results-info absolute top-0 right-0 p-2 rounded-tr-lg rounded-bl-lg text-white font-medium bg-bdo"
+        class="results-info absolute top-0 right-0 p-2 rounded-tr-lg rounded-bl-lg text-white font-medium text-xs md:text-sm bg-bdo"
         v-if="showingResult > 0"
       >
         Showing {{ showingResult }} movies
@@ -431,7 +431,7 @@ export default {
     },
 
     totalPages() {
-      return Math.round((this.totalResults + 10) / 10);
+      return Math.round((parseInt(this.totalResults) + 10) / 10);
     },
   },
 
