@@ -126,7 +126,7 @@
       </div>
 
       <div
-        class="pages-info p-2 absolute bottom-0 left-0 rounded-bl-lg rounded-tr-lg text-white font-medium text-xs md:text-sm bg-bdo"
+        class="pages-info p-1 md:p-2 absolute bottom-0 left-0 rounded-bl-lg rounded-tr-lg text-white font-medium text-xs md:text-sm bg-bdo"
         v-if="showingResult > 0"
       >
         Page {{ currentPage }} of {{ totalPages }}
@@ -533,6 +533,7 @@ export default {
 
       if (presentPage - 5 >= 1) {
         await this.fetchMovie(this.$route.query.name, presentPage + 5);
+        return
       }
 
       this.showWarning("Cannot skip to that page.");
@@ -544,6 +545,7 @@ export default {
 
       if (presentPage - 1 >= 1) {
         await this.fetchMovie(this.$route.query.name, presentPage - 1);
+        return
       }
 
       this.showWarning("Cannot go beyond the first page.");
@@ -555,6 +557,7 @@ export default {
 
       if (presentPage + 1 <= this.totalPages) {
         await this.fetchMovie(this.$route.query.name, presentPage + 1);
+        return
       }
 
       this.showWarning("Cannot go beyond the last page.");
@@ -566,6 +569,7 @@ export default {
 
       if (presentPage + 5 <= this.totalPages) {
         await this.fetchMovie(this.$route.query.name, presentPage + 5);
+        return
       }
 
       this.showWarning("Cannot skip to that page.");
@@ -578,6 +582,7 @@ export default {
 
       if (jumpValue >= 1 && jumpValue <= totalPage) {
         await this.fetchMovie(this.$route.query.name, jumpValue);
+        return
       }
 
       this.showWarning("Cannot jump to that page.");
