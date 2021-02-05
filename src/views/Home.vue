@@ -1,5 +1,4 @@
 <template>
-  <!-- <div class="home w-100 w-full h-100 h-full cover-full text-blue-700" :style="image"> -->
   <div
     class="home grid gap-0 grid-cols-1 md:grid-cols-2 relative bg-jas w-full md:w-screen h-full md:h-screen p-2 text-blackl text-base overflow-hidden"
   >
@@ -127,7 +126,7 @@
       </div>
 
       <div
-        class="pages-info p-2 absolute bottom-0 left-0 rounded-bl-lg rounded-tr-lg text-white font-medium bg-bdo"
+        class="pages-info p-2 absolute bottom-0 left-0 rounded-bl-lg rounded-tr-lg text-white font-medium text-xs md:text-sm bg-bdo"
         v-if="showingResult > 0"
       >
         Page {{ currentPage }} of {{ totalPages }}
@@ -431,11 +430,7 @@ export default {
     },
 
     totalPages() {
-      if ((parseInt(this.totalResults) % 10) !== 0) {
-        return Math.round(parseInt(this.totalResults) / 10) + 1
-      }
-
-      return Math.round(parseInt(this.totalResults) / 10);
+      return (Math.round(parseInt(this.totalResults)) / 10);
     },
   },
 
