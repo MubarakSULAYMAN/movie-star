@@ -430,7 +430,7 @@ export default {
     },
 
     totalPages() {
-      return (Math.round(parseInt(this.totalResults)) / 10);
+      return Math.round(parseInt(this.totalResults) / 10);
     },
   },
 
