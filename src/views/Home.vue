@@ -574,14 +574,11 @@ export default {
     },
 
     async jumpTo(val) {
-      let presentPage = parseInt(this.$route.query.page);
+      let totalPage = parseInt(this.totalPages);
       let jumpValue = parseInt(val);
 
-      if (
-        presentPage + jumpValue <= this.totalPages ||
-        presentPage - jumpValue >= 1
-      ) {
-        await this.fetchMovie(this.$route.query.name, presentPage + jumpValue);
+      if (jumpValue >= 1 && jumpValue <= totalPage) {
+        await this.fetchMovie(this.$route.query.name, jumpValue);
       }
 
       this.showWarning("Cannot jump to that page.");
