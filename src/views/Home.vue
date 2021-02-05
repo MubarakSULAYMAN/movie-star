@@ -111,9 +111,10 @@
           maxlength="2"
           step="5"
           v-model="jumpToValue"
+          @keyup.enter="jumpTo(jumpToValue)"
         />
         <span class="per-page-text"
-          >Enter number between 1 and {{ totalPages }} then press Enter</span
+          >Enter number between 1 and {{ totalPages }} then press Enter or Send</span
         >
       </div>
 
@@ -322,18 +323,18 @@
     </div>
     <div
       class="navigate flex flex-row justify-between absolute bottom-0 right-2 w-36 sm:w-48 md:w-44 lg:w-52 p-1 text-lg sm:text-xl md:text-2xl lg:text-3xl"
-      v-if="showingResult > 0"
     >
-      <button class="double-back">
+      <!-- v-if="showingResult > 0" -->
+      <button class="double-back" @click="skipToPrevious">
         <font-awesome-icon :icon="['fas', 'angle-double-left']" />
       </button>
-      <button class="back">
+      <button class="back" @click="toPrevious">
         <font-awesome-icon :icon="['fas', 'chevron-circle-left']" />
       </button>
-      <button class="next">
+      <button class="next" @click="toNext">
         <font-awesome-icon :icon="['fas', 'chevron-circle-right']" />
       </button>
-      <button class="double-next">
+      <button class="double-next" @click="skipToNext">
         <font-awesome-icon :icon="['fas', 'angle-double-right']" />
       </button>
     </div>
@@ -419,7 +420,7 @@ export default {
 
   mounted() {
     // if (this.movies.length) {
-    this.fetchMovie(this.$route.query.name);
+    this.fetchMovie(this.$route.query.name, this.$route.query.page);
     // }
   },
 
@@ -466,20 +467,24 @@ export default {
 
     async refetchMovie() {
       // if (this.movieName) {
-      await this.fetchMovie(this.movieName);
+      await this.fetchMovie(this.movieName, this.currentPage);
       // }
     },
 
-    async fetchMovie(name) {
+    async fetchMovie(name, page) {
       const searchTerm = name;
 
       if (searchTerm) {
         this.searching = true;
+        this.currentPage = page;
         this.movies = [];
+        this.moviesRated = [];
+
+        let routeParams = `&page=${page}&apikey=${this.token}`;
 
         try {
           let response = await apiRequest.get(
-            `/?s=${searchTerm}&apikey=${this.token}`
+            `/?s=${searchTerm}${routeParams}`
           );
 
           this.totalResults = response.data.totalResults;
@@ -496,7 +501,7 @@ export default {
 
             for (let i = 0; i < items.length; i++) {
               let newReq = await apiRequest.get(
-                `/?t=${items[i].Title}&page=1&apikey=${this.token}`
+                `/?t=${items[i].Title}${routeParams}`
               );
               this.movies.push(newReq.data);
               this.moviesRated.push(newReq.data.Rated);
@@ -514,13 +519,16 @@ export default {
               this.adultContent = true;
             }
 
-            this.$router.push({
-              path: "/search",
-              query: {
-                name: searchTerm,
-                page: 1,
-              },
-            });
+            this.$router
+              .push({
+                // name: 'Search',
+                path: "/search",
+                query: {
+                  name: searchTerm,
+                  page: this.currentPage,
+                },
+              })
+              .catch(() => {});
           }
         } catch (e) {
           this.showWarning("Error fetching data. Please try again.");
@@ -540,15 +548,64 @@ export default {
       // this.isActive = false
     },
 
-    skipToPrevious() {},
+    async skipToPrevious() {
+      let presentPage = parseInt(this.$route.query.page);
 
-    toPrevious() {},
+      if (presentPage - 5 >= 1) {
+        await this.fetchMovie(this.$route.query.name, presentPage + 5);
+      }
 
-    toNext() {},
+      this.showWarning("Cannot skip to that page.");
+      return;
+    },
 
-    skiopToNext() {},
+    async toPrevious() {
+      let presentPage = parseInt(this.$route.query.page);
 
-    jumpTo() {},
+      if (presentPage - 1 >= 1) {
+        await this.fetchMovie(this.$route.query.name, presentPage - 1);
+      }
+
+      this.showWarning("Cannot go beyond the first page.");
+      return;
+    },
+
+    async toNext() {
+      let presentPage = parseInt(this.$route.query.page);
+
+      if (presentPage + 1 <= this.totalPages) {
+        await this.fetchMovie(this.$route.query.name, presentPage + 1);
+      }
+
+      this.showWarning("Cannot go beyond the last page.");
+      return;
+    },
+
+    async skipToNext() {
+      let presentPage = parseInt(this.$route.query.page);
+
+      if (presentPage + 5 <= this.totalPages) {
+        await this.fetchMovie(this.$route.query.name, presentPage + 5);
+      }
+
+      this.showWarning("Cannot skip to that page.");
+      return;
+    },
+
+    async jumpTo(val) {
+      let presentPage = parseInt(this.$route.query.page);
+      let jumpValue = parseInt(val);
+
+      if (
+        presentPage + jumpValue <= this.totalPages ||
+        presentPage - jumpValue >= 1
+      ) {
+        await this.fetchMovie(this.$route.query.name, presentPage + jumpValue);
+      }
+
+      this.showWarning("Cannot jump to that page.");
+      return;
+    },
   },
 };
 </script>
