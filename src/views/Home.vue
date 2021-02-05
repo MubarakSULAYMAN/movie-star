@@ -97,7 +97,7 @@
       </div>
 
       <div
-        class="per-page absolute top-0 right-32 p-2 rounded-b-lg text-white font-medium text-xs md:text-sm bg-bdo"
+        class="per-page absolute top-0 left-1/2 p-2 rounded-b-lg text-white font-medium text-xs md:text-sm bg-bdo"
         v-if="showingResult > 0"
       >
         Jump to
