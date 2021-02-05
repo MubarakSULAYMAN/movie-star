@@ -114,7 +114,8 @@
           @keyup.enter="jumpTo(jumpToValue)"
         />
         <span class="per-page-text"
-          >Enter number between 1 and {{ totalPages }} then press Enter or Send</span
+          >Enter number between 1 and {{ totalPages }} then press Enter or
+          Send</span
         >
       </div>
 
@@ -184,10 +185,7 @@
                 <div class="year">{{ movie.Year | truncateYear }}</div>
                 <div class="group text-fer">{{ movie.Rated }}</div>
                 <div class="rate">
-                  <font-awesome-icon
-                    :icon="['far', 'star']"
-                    class="bg-jas text-jas"
-                  />
+                  <font-awesome-icon :icon="['far', 'star']" class="text-jas" />
                   {{ movie.imdbRating }}
                 </div>
               </div>
@@ -323,8 +321,8 @@
     </div>
     <div
       class="navigate flex flex-row justify-between absolute bottom-0 right-2 w-36 sm:w-48 md:w-44 lg:w-52 p-1 text-lg sm:text-xl md:text-2xl lg:text-3xl"
+      v-if="showingResult > 0"
     >
-      <!-- v-if="showingResult > 0" -->
       <button class="double-back" @click="skipToPrevious">
         <font-awesome-icon :icon="['fas', 'angle-double-left']" />
       </button>
@@ -348,7 +346,6 @@
 </template>
 
 <script>
-// import axios from "axios";
 import apiRequest from "../utils/ApiUtils";
 
 export default {
@@ -436,14 +433,6 @@ export default {
     totalPages() {
       return Math.round(this.totalResults / 10);
     },
-
-    // realTotalPages() {
-    //   return (this.totalResults / this.showingResult).toFixed();
-    // },
-
-    // fullNominationState() {
-    //   return this.fullNominationInfo;
-    // },
   },
 
   methods: {
@@ -456,14 +445,6 @@ export default {
       this.isWarning = true;
       setTimeout(() => (this.isWarning = false), 5000);
     },
-
-    // fullNominationInfo() {
-    //   if (this.nominations.length >= 5) {
-    //     this.fullNomination = true;
-    //   }
-
-    //   return this.fullNomination = false;
-    // },
 
     async refetchMovie() {
       // if (this.movieName) {
