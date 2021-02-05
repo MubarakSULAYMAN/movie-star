@@ -97,7 +97,7 @@
       </div>
 
       <div
-        class="per-page absolute top-0 left-1/3 p-1 md:p-2 rounded-b-lg text-white font-medium text-xs md:text-sm bg-bdo"
+        class="per-page absolute top-0 left-1/2 p-1 md:p-2 rounded-b-lg text-white font-medium text-xs md:text-sm bg-bdo"
         v-if="showingResult > 0"
       >
         Jump to
@@ -431,7 +431,10 @@ export default {
     },
 
     totalPages() {
-      // return Math.round((parseInt(this.totalResults) + 10) / 10);
+      if ((parseInt(this.totalResults) % 10) !== 0) {
+        return Math.round(parseInt(this.totalResults) / 10) + 1
+      }
+
       return Math.round(parseInt(this.totalResults) / 10);
     },
   },
