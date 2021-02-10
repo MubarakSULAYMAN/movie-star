@@ -1,6 +1,6 @@
 # movie-star
-```Movie-"Star"``` is a movie querying app, built with vue, axios, tailwind, CSS3, omdb api and lots love, and deployed on vercel.
-Kindly explore us on [Movie Star](https://movie-star-vercel.app/). 
+```Movie :star:``` is a movie querying app, built with vue, axios, tailwind, CSS3, omdb api and lots love, and deployed on vercel.
+Kindly explore us on :link: [Movie Star](https://movie-star-vercel.app/). 
 
 ## Project setup
 ```
